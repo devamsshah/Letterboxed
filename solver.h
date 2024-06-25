@@ -45,6 +45,12 @@ int countUniqueCharacters(const string& input) {
     return uniqueChars.size();
 }
 
+int nullfun(int a){
+    return a;
+}
+
+
+
 double ratUnique(vector<vector<Wurd> > w, Wurd word){
     double s = countUniqueCharacters(word.getW());
     vector<Wurd> temp = w[static_cast<int>(word[word.getW()[0]])-97];
