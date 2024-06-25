@@ -6,16 +6,14 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <cmath>
+#include <unordered_set>
+#include "printer.h"
 using namespace std;
 #ifndef LETTERBOXED_SOLVER_H
 #define LETTERBOXED_SOLVER_H
 
-struct wurd{
-    string w;
-    double p;
-};
-
-int findSide(vector<bool> b, char a, vector<string> set){
+int findSide(char a, vector<string> set){
     for (int i = 0; i < set.size(); ++i) {
         for (int j = 0; j < set[i].size(); ++j) {
             if(set[i][j] == a){
@@ -26,8 +24,57 @@ int findSide(vector<bool> b, char a, vector<string> set){
     return -1;
 }
 
+double f(double x){
+    if(x<0){
+        x = -1*x;
+    }
+    if(x>1){
+        x = x-(static_cast<int>(x));
+    }
+    double innerCos = cos(M_PI * x);
+    double outerCos = cos(innerCos + 2);
+    double result = (((-outerCos + 1) / sqrt(2)) + 0.2) / 2;
+    return result;
+}
+
+int countUniqueCharacters(const string& input) {
+    unordered_set<char> uniqueChars;
+    for (char ch : input) {
+        uniqueChars.insert(ch);
+    }
+    return uniqueChars.size();
+}
+
+double ratUnique(vector<vector<Wurd> > w, Wurd word){
+    double s = countUniqueCharacters(word.getW());
+    vector<Wurd> temp = w[static_cast<int>(word[word.getW()[0]])-97];
+    int p = 0;
+    for (int i = 0; i < temp.size(); ++i) {
+        p+= temp[i].getW().size();
+    }
+    return s/p;
+}
+
+
+double weight(double x, double ratioUnique, double ratioPoss){
+    return (x*ratioUnique)+((1-x)*ratioPoss);
+}
+
+double ratPoss(vector<vector<Wurd> > w, Wurd word){
+    char c = word.getW()[word.getW().size()-1];
+    int a = static_cast<int>(c)-97;
+    double s = w[a].size();
+    int p = 0;
+    for (int i = 0; i < w.size(); ++i) {
+        p += w[i].size();
+    }
+    return s/(p/12);
+}
+
+
+
 bool isOnSameSide(vector<bool>& b, char a, vector<string> set){
-    int c = findSide(b,a,set);
+    int c = findSide(a,set);
     if(c==-1 || b[c]){
         return true;
     }
@@ -37,6 +84,8 @@ bool isOnSameSide(vector<bool>& b, char a, vector<string> set){
     b[c]=true;
     return false;
 }
+
+
 
 bool possible(const vector<string>& set, string word, vector<bool>& b){
     for (int i = 0; i < word.size(); ++i) {
@@ -59,40 +108,6 @@ vector<vector<string> > processWords(const vector<string>& words, const vector<s
     return wordVec;
 }
 
-
-
-//
-//bool compareByLength(const std::string& a, const std::string& b) {
-//    return a.size() < b.size();
-//}
-//
-//vector<vector<string> > sorter(vector<vector<string> >& pWords) {
-//    for (int i = 0; i < 26; ++i) {
-//        sort(pWords[i].begin(), pWords[i].end(), compareByLength);
-//    }
-//    return pWords;
-//}
-
-void printer(vector<string> v){
-    cout << "called printer" << endl;
-    for (int i = 0; i < v.size(); ++i) {
-        cout << v[i] << endl;
-    }
-}
-
-void printer(vector<vector<string> >v){
-    int c = 0;
-    cout << "called printer2d" << endl;
-    for (int i = 0; i < v.size(); ++i) {
-        for (int j = 0; j < v[i].size(); ++j) {
-            cout << v[i][j] << endl;
-            c++;
-        }
-        cout << "printing new letter: " << i << endl;
-    }
-    cout << "printed " << c << " total words" << endl;
-}
-
 void solver(const vector<string>& words, const int limit){
     cout << "enter the 12 characters in 3 <newline> 3... format"<< endl;
     string one, two, three, four;
@@ -113,3 +128,10 @@ void solver(const vector<string>& words, const int limit){
 //wca
 //kge
 //uro
+//
+//a
+//5
+//bsa
+//zru
+//gko
+//eit
