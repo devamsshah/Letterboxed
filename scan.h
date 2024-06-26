@@ -6,7 +6,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
-
+#include "wurd.h"
 #ifndef LETTERBOXED_SCAN_H
 #define LETTERBOXED_SCAN_H
 

@@ -47,7 +47,7 @@ int countUniqueCharacters(const string& input) {
 
 double ratUnique(vector<vector<Wurd> > w, Wurd word){
     double s = countUniqueCharacters(word.getW());
-    vector<Wurd> temp = w[static_cast<int>(word[word.getW()[0]])-97];
+    vector<Wurd> temp = w[static_cast<int>(word.getW()[word.getW()[0]])-97];
     int p = 0;
     for (int i = 0; i < temp.size(); ++i) {
         p+= temp[i].getW().size();
@@ -70,6 +70,15 @@ double ratPoss(vector<vector<Wurd> > w, Wurd word){
     }
     return s/(p/12);
 }
+
+vector<double> quadrature(int lim){
+    vector<double> points;
+    for (int i = 0; i < lim; ++i) {
+        points.push_back(f(static_cast<double>(i)/static_cast<double>(lim)));
+    }
+    return points;
+}
+
 
 
 
@@ -95,20 +104,21 @@ bool possible(const vector<string>& set, string word, vector<bool>& b){
     return true;
 }
 
-vector<vector<string> > processWords(const vector<string>& words, const vector<string>& set) {
-    vector<vector<string> > wordVec(26);
+vector<vector<Wurd> > processWords(const vector<string>& words, const vector<string>& set) {
+    vector<vector<Wurd> > wordVec(26);
     int ind = 0;
     for (const auto& word : words) {
         vector<bool> b(4, false);
         if (possible(set, word, b)) {
             ind = static_cast<int>(word[0]) - 97;
-            wordVec[ind].push_back(word);
+            Wurd w(word, 0.0);
+            wordVec[ind].push_back(w);
         }
     }
     return wordVec;
 }
 
-void solver(const vector<string>& words, const int limit){
+void solver(vector<string> words, const int limit){
     cout << "enter the 12 characters in 3 <newline> 3... format"<< endl;
     string one, two, three, four;
     cin >> one >> two >> three >> four;
@@ -118,8 +128,10 @@ void solver(const vector<string>& words, const int limit){
     set.push_back(three);
     set.push_back(four);
     printer(set);
-    vector<vector<string> > pWords = processWords(words, set);
+    vector<vector<Wurd> > pWords = processWords(words, set);
     printer(pWords);
+    vector<double> r = quadrature(limit);
+
 }
 #endif //LETTERBOXED_SOLVER_H
 //a

@@ -5,13 +5,13 @@
 #ifndef LETTERBOXED_WURD_H
 #define LETTERBOXED_WURD_H
 
-
+using namespace std;
 class Wurd {
 private:
     string w;
     double p;
 public:
-    Wurd(const std::string& str, double dbl) : w(str), p(dbl) {}
+    Wurd(const string& str, double dbl) : w(str), p(dbl) {}
 
     string getW() const {
         return w;
