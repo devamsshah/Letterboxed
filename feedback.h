@@ -20,7 +20,7 @@ void finished(vector<string> userAnswer, int n){
     if(userAnswer.size() > n)
         cout << "CONGRATULATIONS, YOU SUCCESSFULLY COMPLETED THE GAME!" << endl;
     else
-        cout << "CONGRATULATIONS, YOU SUCCESSFULLY SOLVED LETTERBOXED WITHIN " << n << (n==1? "WORD!": "WORDS!") << endl;
+        cout << "CONGRATULATIONS, YOU SUCCESSFULLY SOLVED LETTERBOXED WITHIN " << n << (n==1? " WORD!": " WORDS!") << endl;
 
 }
 

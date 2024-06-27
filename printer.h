@@ -37,4 +37,12 @@ void printer(vector<vector<Wurd> >v){
     }
     cout << "printed " << c << " total words" << endl;
 }
+
+
+void printer(vector<double> v){
+    for (int i = 0; i < v.size(); ++i) {
+        cout << v[i] << endl;
+    }
+}
+
 #endif //LETTERBOXED_PRINTER_H

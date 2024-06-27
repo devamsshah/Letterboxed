@@ -60,10 +60,14 @@ double weight(double x, double ratioUnique, double ratioPoss){
     return (x*ratioUnique)+((1-x)*ratioPoss);
 }
 
-double ratPoss(vector<vector<Wurd> > w, Wurd word){
-    char c = word.getW()[word.getW().size()-1];
+int lett(vector<vector<Wurd> > w, string end){
+    char c = end[end.size()-1];
     int a = static_cast<int>(c)-97;
-    double s = w[a].size();
+    return w[a].size();
+}
+
+double ratPoss(vector<vector<Wurd> > w, Wurd word){
+    double s = lett(w, word.getW());
     int p = 0;
     for (int i = 0; i < w.size(); ++i) {
         p += w[i].size();
@@ -74,7 +78,7 @@ double ratPoss(vector<vector<Wurd> > w, Wurd word){
 vector<double> quadrature(int lim){
     vector<double> points;
     for (int i = 0; i < lim; ++i) {
-        points.push_back(f(static_cast<double>(i)/static_cast<double>(lim)));
+        points.push_back(f(static_cast<double>(i)/static_cast<double>(lim-1)));
     }
     return points;
 }
@@ -95,6 +99,16 @@ bool isOnSameSide(vector<bool>& b, char a, vector<string> set){
 }
 
 
+void addRat(vector<vector<Wurd> >& word, double q){
+    for (int i = 0; i < word.size(); ++i) {
+        for (int j = 0; j < word[i].size(); ++j) {
+            double m = ratUnique(word, word[i][j]);
+            double n = ratPoss(word, word[i][j]);
+            word[i][j].setP(weight(q, m, n));
+        }
+    }
+}
+
 
 bool possible(const vector<string>& set, string word, vector<bool>& b){
     for (int i = 0; i < word.size(); ++i) {
@@ -103,6 +117,30 @@ bool possible(const vector<string>& set, string word, vector<bool>& b){
     }
     return true;
 }
+void swap(Wurd& a, Wurd& b) {
+    Wurd temp = a;
+    a = b;
+    b = temp;
+}
+
+void sortWurds(std::vector<Wurd>& vec) {
+    int n = vec.size();
+    for (int i = 0; i < n-1; ++i) {
+        for (int j = 0; j < n-i-1; ++j) {
+            if (vec[j].getP() < vec[j+1].getP()) {
+                swap(vec[j], vec[j+1]);
+            }
+        }
+    }
+}
+
+void sort(vector<vector<Wurd> >& w){
+    for(auto& vec : w) {
+        sortWurds(vec);
+    }
+}
+
+
 
 vector<vector<Wurd> > processWords(const vector<string>& words, const vector<string>& set) {
     vector<vector<Wurd> > wordVec(26);
@@ -127,20 +165,22 @@ void solver(vector<string> words, const int limit){
     set.push_back(two);
     set.push_back(three);
     set.push_back(four);
-    printer(set);
     vector<vector<Wurd> > pWords = processWords(words, set);
-    printer(pWords);
     vector<double> r = quadrature(limit);
-
+    addRat(pWords, 1);
+    printer(words);
+    sort(pWords);
+    printer(words);
 }
 #endif //LETTERBOXED_SOLVER_H
+
 //a
 //5
 //nlb
 //wca
 //kge
 //uro
-//
+
 //a
 //5
 //bsa
