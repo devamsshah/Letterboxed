@@ -45,13 +45,8 @@ int countUniqueCharacters(const string& input) {
     return uniqueChars.size();
 }
 
-double ratUnique(vector<vector<Wurd> > w, Wurd word){
+double ratUnique(vector<vector<Wurd> > w, Wurd word, double p){
     double s = countUniqueCharacters(word.getW());
-    vector<Wurd> temp = w[static_cast<int>(word.getW()[word.getW()[0]])-97];
-    int p = 0;
-    for (int i = 0; i < temp.size(); ++i) {
-        p+= temp[i].getW().size();
-    }
     return s/p;
 }
 
@@ -66,12 +61,8 @@ int lett(vector<vector<Wurd> > w, string end){
     return w[a].size();
 }
 
-double ratPoss(vector<vector<Wurd> > w, Wurd word){
+double ratPoss(vector<vector<Wurd> > w, Wurd word, int p){
     double s = lett(w, word.getW());
-    int p = 0;
-    for (int i = 0; i < w.size(); ++i) {
-        p += w[i].size();
-    }
     return s/(p/12);
 }
 
@@ -99,11 +90,12 @@ bool isOnSameSide(vector<bool>& b, char a, vector<string> set){
 }
 
 
-void addRat(vector<vector<Wurd> >& word, double q){
+void addRat(vector<vector<Wurd> >& word, double q, vector<double> avg, int t){
     for (int i = 0; i < word.size(); ++i) {
         for (int j = 0; j < word[i].size(); ++j) {
-            double m = ratUnique(word, word[i][j]);
-            double n = ratPoss(word, word[i][j]);
+            int c = static_cast<int>(word[i][j].getW()[(word[i][j].getW().size()-1)])-97;
+            double m = ratUnique(word, word[i][j], avg[c]);
+            double n = ratPoss(word, word[i][j], t);
             word[i][j].setP(weight(q, m, n));
         }
     }
@@ -140,6 +132,20 @@ void sort(vector<vector<Wurd> >& w){
     }
 }
 
+vector<double> avgSize(vector<vector<Wurd> > w, int &t){
+    vector<double> avg;
+    t=0;
+    for (int i = 0; i < w.size(); ++i) {
+        double a = 0;
+        t+=w[i].size();
+        for (int j = 0; j < w[i].size(); ++j) {
+            a+=w[i][j].getW().size();
+        }
+        double b = a/w[i].size();
+        avg.push_back(b);
+    }
+    return avg;
+}
 
 
 vector<vector<Wurd> > processWords(const vector<string>& words, const vector<string>& set) {
@@ -147,7 +153,7 @@ vector<vector<Wurd> > processWords(const vector<string>& words, const vector<str
     int ind = 0;
     for (const auto& word : words) {
         vector<bool> b(4, false);
-        if (possible(set, word, b)) {
+        if (word.size() > 2 && possible(set, word, b) ) {
             ind = static_cast<int>(word[0]) - 97;
             Wurd w(word, 0.0);
             wordVec[ind].push_back(w);
@@ -167,10 +173,11 @@ void solver(vector<string> words, const int limit){
     set.push_back(four);
     vector<vector<Wurd> > pWords = processWords(words, set);
     vector<double> r = quadrature(limit);
-    addRat(pWords, 1);
-    printer(words);
+    int totWords = 0;
+    vector<double> avg = avgSize(pWords, totWords);
+    addRat(pWords, 1, avg, totWords);
+    printer(pWords);
     sort(pWords);
-    printer(words);
 }
 #endif //LETTERBOXED_SOLVER_H
 
@@ -187,3 +194,10 @@ void solver(vector<string> words, const int limit){
 //zru
 //gko
 //eit
+
+//a
+//6
+//jxz
+//uel
+//oin
+//rca
