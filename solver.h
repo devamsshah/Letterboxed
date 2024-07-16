@@ -157,8 +157,8 @@ vector<Wurd> nextGuessPoss(vector<vector<Wurd> > w, Wurd word, vector<int> ww, d
 void solver(const int limit){
     cout << "enter the 12 characters in 3 <newline> 3... format"<< endl;
     string one, two, three, four;
-    cin >> one >> two >> three >> four;
     vector<string> set;
+    cin >> one >> two >> three >> four;
     set.push_back(one);
     set.push_back(two);
     set.push_back(three);
@@ -181,8 +181,6 @@ void solver(const int limit){
 //git add .
 //git commit -m "added comments and made the code faster and space efficient for solver by scanning and loading and saving poss words together in the solver case "
 //git push -u origin main
-
-
 
 //a
 //5
@@ -277,7 +275,7 @@ void solver(const int limit){
 //tsl
 //dia
 //oku
-
+//
 //a
 //5
 //ceo
