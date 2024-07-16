@@ -45,4 +45,10 @@ void printer(vector<double> v){
     }
 }
 
+void printer(vector<Wurd> v){
+    for (int j = 0; j < v.size(); ++j) {
+        v[j].print();
+    }
+}
+
 #endif //LETTERBOXED_PRINTER_H

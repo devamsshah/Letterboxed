@@ -8,8 +8,9 @@
 using namespace std;
 class Wurd {
 private:
-    string w;
-    double p;
+    string w; // the word
+    double p; // the guesses rating
+    vector<Wurd> vec; //next guesses in order
 public:
     Wurd(const string& str, double dbl) : w(str), p(dbl) {}
 
@@ -27,6 +28,14 @@ public:
 
     void setP(double dbl) {
         p = dbl;
+    }
+
+    vector<Wurd> getVec(){
+        return vec;
+    }
+
+    void setVec(vector<Wurd> v){
+        vec = v;
     }
 
     void print() const{

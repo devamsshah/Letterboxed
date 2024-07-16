@@ -9,10 +9,13 @@
 #include <cmath>
 #include <unordered_set>
 #include "printer.h"
+#include "math.h"
+#include "sorter.h"
 using namespace std;
 #ifndef LETTERBOXED_SOLVER_H
 #define LETTERBOXED_SOLVER_H
 
+//find on which side the letter belongs to and return the side number
 int findSide(char a, vector<string> set){
     for (int i = 0; i < set.size(); ++i) {
         for (int j = 0; j < set[i].size(); ++j) {
@@ -24,59 +27,8 @@ int findSide(char a, vector<string> set){
     return -1;
 }
 
-double f(double x){
-    if(x<0){
-        x = -1*x;
-    }
-    if(x>1){
-        x = x-(static_cast<int>(x));
-    }
-    double innerCos = cos(M_PI * x);
-    double outerCos = cos(innerCos + 2);
-    double result = (((-outerCos + 1) / sqrt(2)) + 0.2) / 2;
-    return result;
-}
-
-int countUniqueCharacters(const string& input) {
-    unordered_set<char> uniqueChars;
-    for (char ch : input) {
-        uniqueChars.insert(ch);
-    }
-    return uniqueChars.size();
-}
-
-double ratUnique(vector<vector<Wurd> > w, Wurd word, double p){
-    double s = countUniqueCharacters(word.getW());
-    return s/p;
-}
-
-
-double weight(double x, double ratioUnique, double ratioPoss){
-    return (x*ratioUnique)+((1-x)*ratioPoss);
-}
-
-int lett(vector<vector<Wurd> > w, string end){
-    char c = end[end.size()-1];
-    int a = static_cast<int>(c)-97;
-    return w[a].size();
-}
-
-double ratPoss(vector<vector<Wurd> > w, Wurd word, int p){
-    double s = lett(w, word.getW());
-    return s/(p/12);
-}
-
-vector<double> quadrature(int lim){
-    vector<double> points;
-    for (int i = 0; i < lim; ++i) {
-        points.push_back(f(static_cast<double>(i)/static_cast<double>(lim-1)));
-    }
-    return points;
-}
-
-
-
-
+//checks if the previous letter is on the same side or not
+//returns false if the letter is not on the same side
 bool isOnSameSide(vector<bool>& b, char a, vector<string> set){
     int c = findSide(a,set);
     if(c==-1 || b[c]){
@@ -89,19 +41,7 @@ bool isOnSameSide(vector<bool>& b, char a, vector<string> set){
     return false;
 }
 
-
-void addRat(vector<vector<Wurd> >& word, double q, vector<double> avg, int t){
-    for (int i = 0; i < word.size(); ++i) {
-        for (int j = 0; j < word[i].size(); ++j) {
-            int c = static_cast<int>(word[i][j].getW()[(word[i][j].getW().size()-1)])-97;
-            double m = ratUnique(word, word[i][j], avg[c]);
-            double n = ratPoss(word, word[i][j], t);
-            word[i][j].setP(weight(q, m, n));
-        }
-    }
-}
-
-
+//checks if the given word is possible as an input to the given set of letterboxed
 bool possible(const vector<string>& set, string word, vector<bool>& b){
     for (int i = 0; i < word.size(); ++i) {
         if(isOnSameSide(b, word[i], set))
@@ -109,35 +49,70 @@ bool possible(const vector<string>& set, string word, vector<bool>& b){
     }
     return true;
 }
-void swap(Wurd& a, Wurd& b) {
-    Wurd temp = a;
-    a = b;
-    b = temp;
+
+//counts the number of unique characters in the given string
+int countUniqueCharacters(const string& input, unordered_set<char>& uniqueChars){
+    int a = uniqueChars.size();
+    for (char ch : input) {
+        uniqueChars.insert(ch);
+    }
+    return uniqueChars.size()-(a);
 }
 
-void sortWurds(std::vector<Wurd>& vec) {
-    int n = vec.size();
-    for (int i = 0; i < n-1; ++i) {
-        for (int j = 0; j < n-i-1; ++j) {
-            if (vec[j].getP() < vec[j+1].getP()) {
-                swap(vec[j], vec[j+1]);
-            }
+//counts ratio of unique characters compared to the average word size
+double ratUnique(Wurd word, double p){
+    unordered_set<char> uniqueChars;
+    double s = countUniqueCharacters(word.getW(), uniqueChars);
+    return s/p;
+}
+
+//given a word, finds the ratio of unique letters vs avg word size of the second guess
+double ratUnique(Wurd og, Wurd curr, vector<string> set, double p){
+    unordered_set<char> a;
+    countUniqueCharacters(og.getW(), a);
+    double s = countUniqueCharacters(curr.getW(), a);
+    return s/p;
+}
+
+//gives the frequency and likelihood of the next letter
+double ratPoss(vector<int> w, Wurd word, int totWords){
+    char c = word.getW()[word.getW().size()-1];
+    int a = static_cast<int>(c)-97;
+    double s = w[a];
+    return s/(totWords/12);
+}
+
+//combines the two ratios (ratUnique and ratPoss) and gives out the final ration
+void addRat(vector<vector<Wurd> >& word, double q, vector<double> avg, int totWords, vector<int> w){
+    for (int i = 0; i < word.size(); ++i) {
+        for (int j = 0; j < word[i].size(); ++j) {
+            int c = static_cast<int>(word[i][j].getW()[(word[i][j].getW().size()-1)])-97;
+            double m = ratUnique(word[i][j], avg[c]);
+            double n = ratPoss(w, word[i][j], totWords);
+            word[i][j].setP(weight(q, m, n));
         }
     }
 }
 
-void sort(vector<vector<Wurd> >& w){
-    for(auto& vec : w) {
-        sortWurds(vec);
+
+///something interesting
+void addRat(vector<Wurd>& word, double q, vector<double> avg, int totWords, vector<int> w){
+    for (int i = 0; i < word.size(); ++i) {
+        int c = static_cast<int>(word[i].getW()[(word[i].getW().size()-1)])-97;
+        double m = ratUnique(word[i], avg[c]);
+        double n = ratPoss(w, word[i], totWords);
+        word[i].setP(weight(q, m, n));
     }
 }
 
-vector<double> avgSize(vector<vector<Wurd> > w, int &t){
+//finds the average size of words for each start letter and modifies the totatl number of words
+vector<double> avgSize(vector<vector<Wurd> > w, int &totalNumWords, vector<int> &numAlphWords){
     vector<double> avg;
-    t=0;
+    totalNumWords=0;
     for (int i = 0; i < w.size(); ++i) {
         double a = 0;
-        t+=w[i].size();
+        totalNumWords+=w[i].size();
+        numAlphWords[i] = w[i].size();
         for (int j = 0; j < w[i].size(); ++j) {
             a+=w[i][j].getW().size();
         }
@@ -147,11 +122,16 @@ vector<double> avgSize(vector<vector<Wurd> > w, int &t){
     return avg;
 }
 
-
-vector<vector<Wurd> > processWords(const vector<string>& words, const vector<string>& set) {
+//goes through the list of words and checks if each word is possible or not
+vector<vector<Wurd> > processWords(const vector<string>& set) {
+    ifstream inputFile("words.txt");
+    if (!inputFile.is_open()) {
+        cerr << "Error opening file" << endl;
+    }
+    string word;
     vector<vector<Wurd> > wordVec(26);
-    int ind = 0;
-    for (const auto& word : words) {
+    int ind;
+    while (getline(inputFile, word)) {
         vector<bool> b(4, false);
         if (word.size() > 2 && possible(set, word, b) ) {
             ind = static_cast<int>(word[0]) - 97;
@@ -159,10 +139,22 @@ vector<vector<Wurd> > processWords(const vector<string>& words, const vector<str
             wordVec[ind].push_back(w);
         }
     }
+    inputFile.close();
     return wordVec;
 }
 
-void solver(vector<string> words, const int limit){
+vector<Wurd> nextGuessPoss(vector<vector<Wurd> > w, Wurd word, vector<int> ww, double q, vector<double> avg, int t){
+    char c = word.getW()[word.getW().size()-1];
+    int a = static_cast<int>(c)-97;
+    vector<Wurd> n = w[a];
+    for (int i = 0; i < n.size(); ++i) {
+        addRat(n, q, avg, t, ww);
+    }
+}
+
+
+
+void solver(const int limit){
     cout << "enter the 12 characters in 3 <newline> 3... format"<< endl;
     string one, two, three, four;
     cin >> one >> two >> three >> four;
@@ -171,15 +163,26 @@ void solver(vector<string> words, const int limit){
     set.push_back(two);
     set.push_back(three);
     set.push_back(four);
-    vector<vector<Wurd> > pWords = processWords(words, set);
+    vector<vector<Wurd> > pWords = processWords(set);
     vector<double> r = quadrature(limit);
     int totWords = 0;
-    vector<double> avg = avgSize(pWords, totWords);
-    addRat(pWords, 1, avg, totWords);
-    printer(pWords);
-    sort(pWords);
+    vector<int> numAlphWords(26, 0);
+    vector<double> avg = avgSize(pWords, totWords, numAlphWords);
+    addRat(pWords, 1, avg, totWords, numAlphWords);
+    vector<Wurd> v = sortAndFlatten(pWords);
+
+    printer(v);
+
+
+
 }
 #endif //LETTERBOXED_SOLVER_H
+
+//git add .
+//git commit -m "added comments and made the code faster and space efficient for solver by scanning and loading and saving poss words together in the solver case "
+//git push -u origin main
+
+
 
 //a
 //5
@@ -201,3 +204,83 @@ void solver(vector<string> words, const int limit){
 //uel
 //oin
 //rca
+
+//a
+//4
+//par
+//inc
+//lwt
+//ous
+
+//a
+//4
+//lin
+//ade
+//htb
+//ucr
+
+//a
+//6
+//ygt
+//xun
+//oaq
+//rsb
+
+
+//a
+//6
+//bpe
+//cua
+//syl
+//rmt
+
+//a
+//6
+//tif
+//grl
+//ncu
+//dhm
+
+//a
+//6
+//
+//ite
+//dsa
+//vxc
+//mpo
+
+
+//a
+//6
+//can
+//wit
+//jep
+//lrx
+
+//a
+//4
+//tyo
+//eil
+//cgn
+//vra
+
+//a
+//5
+//cib
+//lhm
+//ank
+//oup
+
+//a
+//4
+//frn
+//tsl
+//dia
+//oku
+
+//a
+//5
+//ceo
+//str
+//mxu
+//big
