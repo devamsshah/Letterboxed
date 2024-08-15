@@ -39,7 +39,12 @@ public:
     }
 
     void print() const{
-        cout << w << ": " << p << endl;
+        if(!vec.empty()){
+            cout << w << ": " << p << "\t\t\t";
+            vec[1].print();
+        }else {
+            cout << w << ": " << p << endl;
+        }
     }
 };
 

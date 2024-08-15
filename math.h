@@ -14,17 +14,14 @@ double f(double x){
     if(x>1){
         x = x-(static_cast<int>(x));
     }
-    double innerCos = cos(M_PI * x);
-    double outerCos = cos(innerCos + 2);
-    double result = (((-outerCos + 1) / sqrt(2)) + 0.2) / 2;
-    return result;
+    return (0.4/((x+1)*(x+1)*(x+1)*(x+1)))+0.1;
 }
 
 
 vector<double> quadrature(int lim){
     vector<double> points;
     for (int i = 0; i < lim; ++i) {
-        points.push_back(f(static_cast<double>(i)/static_cast<double>(lim-1)));
+        points.push_back(1-f(static_cast<double>(i)/static_cast<double>(lim-1)));
     }
     return points;
 }
