@@ -6,12 +6,13 @@
 #include <sstream>
 #include <vector>
 #include <string>
-#include "wurd.h"
 #include <algorithm>
 #include <cctype>
 
+#pragma once
 #ifndef LETTERBOXED_SCAN_H
 #define LETTERBOXED_SCAN_H
+#include "wurd.h"
 
 using namespace std;
 

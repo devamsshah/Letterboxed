@@ -8,13 +8,14 @@
 #include <string>
 #include <cmath>
 #include <unordered_set>
+
+using namespace std;
+#pragma once
+#ifndef LETTERBOXED_SOLVER_H
+#define LETTERBOXED_SOLVER_H
 #include "printer.h"
 #include "math.h"
 #include "sorter.h"
-using namespace std;
-#ifndef LETTERBOXED_SOLVER_H
-#define LETTERBOXED_SOLVER_H
-
 //find on which side the letter belongs to and return the side number
 int findSide(char a, vector<string> set){
     for (int i = 0; i < set.size(); ++i) {

@@ -1,9 +1,10 @@
 //
 // Created by Devam Shah on 6/25/24.
 //
-#include "wurd.h"
+#pragma once
 #ifndef LETTERBOXED_PRINTER_H
 #define LETTERBOXED_PRINTER_H
+#include "wurd.h"
 
 void printer(vector<string> v){
     cout << "called printer" << endl;

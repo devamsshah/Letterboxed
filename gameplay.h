@@ -3,14 +3,15 @@
 //
 #include <vector>
 
+using namespace std;
+#pragma once
+#ifndef LETTERBOXED_GAMEPLAY_H
+#define LETTERBOXED_GAMEPLAY_H
+
 #include "scan.h"
 #include "validity.h"
 #include "feedback.h"
 #include "initializeQn.h"
-
-using namespace std;
-#ifndef LETTERBOXED_GAMEPLAY_H
-#define LETTERBOXED_GAMEPLAY_H
 
 
 
