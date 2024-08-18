@@ -75,17 +75,28 @@ double ratPoss(vector<int> numWordsForEachAlph, Wurd word, int totWords){
     return s/(totWords/12);
 }
 
+double ratQual(vector<double> avgWordSize, Wurd word){
+    double fin = 0;
+    unordered_set<char> uniqueChars;
+    for (char ch : word.getW()) {
+        uniqueChars.insert(ch);
+    }
+    for (char ch : uniqueChars) {
+        int a = static_cast<int>(ch)-97;
+        fin+= (1/avgWordSize[a]);
+    }
+    return fin;
+}
+
 //combines the two ratios (ratUnique and ratPoss) and gives out the final ration
 int addRat(vector<vector<Wurd> >& words2D, double numGuess, vector<double> avgSizeWords, int totWords, vector<int> numWordsForEachAlph, vector<double> quadratureVec){
     for (int i = 0; i < words2D.size(); ++i) {
         for (int j = 0; j < words2D[i].size(); ++j) {
             int c = static_cast<int>(words2D[i][j].getW()[(words2D[i][j].getW().size()-1)])-97;
             double m = ratUnique("", words2D[i][j].getW(), avgSizeWords[c]);
-            if(m == -1){
-                return -1;
-            }
             double n = ratPoss(numWordsForEachAlph, words2D[i][j], totWords);
-            words2D[i][j].setP(weight(quadratureVec[numGuess], m, n));
+            double o = ratQual(avgSizeWords, words2D[i][j]);
+            words2D[i][j].setP(weight(quadratureVec[numGuess], m, o));
         }
     }
     return 0;
@@ -98,7 +109,8 @@ void addRat(vector<Wurd>& words1D, double numGuess, vector<double> avgSizeWords,
         int lastCharInd = static_cast<int>(words1D[i].getW()[(words1D[i].getW().size()-1)])-97;
         double m = ratUnique(og, words1D[i].getW(), avgSizeWords[lastCharInd]);
         double n = ratPoss(numWordsForEachAlph, words1D[i], totWords);
-        words1D[i].setP(weight(quadratureVec[numGuess], m, n));
+        double o = ratQual(avgSizeWords, words1D[i]);
+        words1D[i].setP(weight(quadratureVec[numGuess], m, o));
     }
 }
 
@@ -162,7 +174,20 @@ void nextGuess(vector<Wurd> & flatVec, vector<vector<Wurd> > words2D, vector<int
     }
 }
 
-void setSumBelow(vector<Wurd> & flatVec){
+vector<Wurd> solvedSet(vector<Wurd> flatvec, vector<string> set){
+    string og = set[0] + set[1] + set[2] + set[3];
+    vector<Wurd> winningWurd;
+    for (int i = 0; i < flatvec.size()*0.1; ++i) {
+        string curr = flatvec[i].getW() + flatvec[i].getVec()[0].getW();
+        if(ratUnique(curr, og,  1) == 0){
+            Wurd ww = flatvec[i];
+            winningWurd.push_back(ww);
+        }
+    }
+    return winningWurd;
+}
+
+vector<Wurd> setSumBelow(vector<Wurd> & flatVec, vector<string> set){
     for (int i = 0; i < flatVec.size(); ++i) {
         if (flatVec[i].getVec().size() == 0){
             flatVec[i].setSumBelow(flatVec[i].getP());
@@ -171,6 +196,7 @@ void setSumBelow(vector<Wurd> & flatVec){
         }
     }
     bubbleSortSumBelow(flatVec);
+    return solvedSet(flatVec, set);
 }
 
 void solver(const int limit){
@@ -192,14 +218,28 @@ void solver(const int limit){
     for (int i = 2; i <= 2; i++){
         nextGuess(flatVec, pWords, numWordsForEachAlph, i,avgSizeWords, totWords, limit, quadratureVec);
     }
-    setSumBelow(flatVec);
-    printer(flatVec);
+    vector<Wurd> solvedVec = setSumBelow(flatVec, set);
+    printer(solvedVec);
 }
 #endif //LETTERBOXED_SOLVER_H
 
 //git add .
 //git commit -m "added comments and made the code faster and space efficient for solver by scanning and loading and saving poss words together in the solver case "
 //git push -u origin main
+
+//a
+//5
+//kme
+//cnd
+//bur
+//ail
+
+//a
+//6
+//uta
+//mln
+//rzo
+//iwc
 
 //a
 //5

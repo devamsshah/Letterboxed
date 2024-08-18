@@ -46,7 +46,7 @@ void printer(vector<double> v){
 }
 
 void printer(vector<Wurd> v){
-    for (int j = 0; j < v.size()*0.2; ++j) {
+    for (int j = 0; j < v.size(); ++j) {
         v[j].print();
     }
 }

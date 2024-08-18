@@ -49,7 +49,7 @@ public:
     void print() const{
         if(!vec.empty()){
             cout << w << ": " << p << "\t\t\t";
-            vec[1].print();
+            vec[0].print();
         }else {
             cout << w << ": " << p << endl;
         }
