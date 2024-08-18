@@ -38,6 +38,26 @@ void bubbleSort(vector<Wurd>& wurds) {
     }
 }
 
+void bubbleSortSumBelow(vector<Wurd>& wurds) {
+    bool swapped;
+    int n = wurds.size();
+
+    for (int i = 0; i < n - 1; ++i) {
+        swapped = false;
+
+        for (int j = 0; j < n - i - 1; ++j) {
+            if (wurds[j].getSumBelow() < wurds[j + 1].getSumBelow()) {
+                swap(wurds[j], wurds[j + 1]);
+                swapped = true;
+            }
+        }
+
+        // If no two elements were swapped by the inner loop, then the list is sorted
+        if (!swapped) {
+            break;
+        }
+    }
+}
 
 //generic sort for 1d vector
 void sortWurds(vector<Wurd>& vec) {

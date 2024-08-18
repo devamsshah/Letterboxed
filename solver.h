@@ -64,9 +64,6 @@ double ratUnique(string og, string curr, double avgWordSize){
     unordered_set<char> uniqueChars;
     countUniqueCharacters(og, uniqueChars);
     double s = countUniqueCharacters(curr, uniqueChars);
-    if(s == 0){
-        return -1;
-    }
     return s/avgWordSize;
 }
 
@@ -79,7 +76,7 @@ double ratPoss(vector<int> numWordsForEachAlph, Wurd word, int totWords){
 }
 
 //combines the two ratios (ratUnique and ratPoss) and gives out the final ration
-int addRat(vector<vector<Wurd> >& words2D, double numGuess, vector<double> avgSizeWords, int totWords, vector<int> numWordsForEachAlph){
+int addRat(vector<vector<Wurd> >& words2D, double numGuess, vector<double> avgSizeWords, int totWords, vector<int> numWordsForEachAlph, vector<double> quadratureVec){
     for (int i = 0; i < words2D.size(); ++i) {
         for (int j = 0; j < words2D[i].size(); ++j) {
             int c = static_cast<int>(words2D[i][j].getW()[(words2D[i][j].getW().size()-1)])-97;
@@ -88,7 +85,7 @@ int addRat(vector<vector<Wurd> >& words2D, double numGuess, vector<double> avgSi
                 return -1;
             }
             double n = ratPoss(numWordsForEachAlph, words2D[i][j], totWords);
-            words2D[i][j].setP(weight(numGuess, m, n));
+            words2D[i][j].setP(weight(quadratureVec[numGuess], m, n));
         }
     }
     return 0;
@@ -96,17 +93,13 @@ int addRat(vector<vector<Wurd> >& words2D, double numGuess, vector<double> avgSi
 
 
 //Adds ratios to a 1d vector of words given that some of the characters are already used
-int addRat(vector<Wurd>& words1D, double numGuess, vector<double> avgSizeWords, int totWords, vector<int> numWordsForEachAlph, string og){
+void addRat(vector<Wurd>& words1D, double numGuess, vector<double> avgSizeWords, int totWords, vector<int> numWordsForEachAlph, string og, vector<double> quadratureVec){
     for (int i = 0; i < words1D.size(); ++i) {
         int lastCharInd = static_cast<int>(words1D[i].getW()[(words1D[i].getW().size()-1)])-97;
         double m = ratUnique(og, words1D[i].getW(), avgSizeWords[lastCharInd]);
-        if(m == -1){
-            return -1;
-        }
         double n = ratPoss(numWordsForEachAlph, words1D[i], totWords);
-        words1D[i].setP(weight(numGuess, m, n));
+        words1D[i].setP(weight(quadratureVec[numGuess], m, n));
     }
-    return 0;
 }
 
 //finds the average size of words for each start letter and modifies the totatl number of words
@@ -126,6 +119,13 @@ vector<double> avgSize(vector<vector<Wurd> > w, int &totalNumWords, vector<int> 
     return avg;
 }
 
+
+std::string to_lowercase(const std::string& str) {
+    std::string result(str);
+    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+    return result;
+}
+
 //goes through the list of words and checks if each word is possible or not
 vector<vector<Wurd> > processWords(const vector<string>& set) {
     ifstream inputFile("words.txt");
@@ -137,9 +137,9 @@ vector<vector<Wurd> > processWords(const vector<string>& set) {
     int ind;
     while (getline(inputFile, word)) {
         vector<bool> b(4, false);
-        if (word.size() > 2 && possible(set, word, b) ) {
-            ind = static_cast<int>(word[0]) - 97;
-            Wurd w(word, 0.0);
+        if (word.size() > 2 && possible(set, to_lowercase(word), b) ) {
+            ind = static_cast<int>(to_lowercase(word)[0]) - 97;
+            Wurd w(to_lowercase(word), 0.0);
             wordVec[ind].push_back(w);
         }
     }
@@ -147,30 +147,31 @@ vector<vector<Wurd> > processWords(const vector<string>& set) {
     return wordVec;
 }
 
-int nextGuessPossPerWord(vector<vector<Wurd> > words2D, Wurd &word, vector<int> numWordsForEachAlph, double quadraturePointx, vector<double> avgWordSizePerAlph, int totWords){
+void nextGuessPossPerWord(vector<vector<Wurd> > words2D, Wurd &word, vector<int> numWordsForEachAlph, double quadraturePointx, vector<double> avgWordSizePerAlph, int totWords, vector<double> quadratureVec){
     char lastChar = word.getW()[word.getW().size()-1];
     int indLastChar = static_cast<int>(lastChar)-97;
     vector<Wurd> words1Dnew = words2D[indLastChar];
-    int indicator = addRat(words1Dnew, quadraturePointx, avgWordSizePerAlph, totWords, numWordsForEachAlph, word.getW());
+    addRat(words1Dnew, quadraturePointx, avgWordSizePerAlph, totWords, numWordsForEachAlph, word.getW(), quadratureVec);
     bubbleSort(words1Dnew);
     word.setVec(words1Dnew);
-    if(indicator == -1){
-        return -1;
-    }
-    return 0;
 }
 
-int nextGuess(vector<Wurd> & flatVec, vector<vector<Wurd> > words2D, vector<int> numWordsForEachAlph, double quadraturePointx, vector<double> avgWordSizePerAlph, int totWords, int limit){
-    for(int i = 0; i < flatVec.size(); i++) {
-        int indicator = nextGuessPossPerWord(words2D, flatVec[i], numWordsForEachAlph, quadraturePointx, avgWordSizePerAlph, totWords);
-        if (indicator == -1) {
-            return -1;
+void nextGuess(vector<Wurd> & flatVec, vector<vector<Wurd> > words2D, vector<int> numWordsForEachAlph, double quadraturePointx, vector<double> avgWordSizePerAlph, int totWords, int limit, vector<double> quadratureVec){
+    for(int i = 0; i < flatVec.size()*0.1; i++) {
+        nextGuessPossPerWord(words2D, flatVec[i], numWordsForEachAlph, quadraturePointx, avgWordSizePerAlph, totWords, quadratureVec);
+    }
+}
+
+void setSumBelow(vector<Wurd> & flatVec){
+    for (int i = 0; i < flatVec.size(); ++i) {
+        if (flatVec[i].getVec().size() == 0){
+            flatVec[i].setSumBelow(flatVec[i].getP());
+        }else {
+            flatVec[i].setSumBelow(flatVec[i].getP() + flatVec[i].getVec()[1].getP());
         }
     }
-    return 0;
+    bubbleSortSumBelow(flatVec);
 }
-
-
 
 void solver(const int limit){
     cout << "enter the 12 characters in 3 <newline> 3... format"<< endl;
@@ -182,16 +183,16 @@ void solver(const int limit){
     set.push_back(three);
     set.push_back(four);
     vector<vector<Wurd> > pWords = processWords(set);
-    vector<double> r = quadrature(limit);
+    vector<double> quadratureVec = quadrature(limit);
     int totWords = 0;
     vector<int> numWordsForEachAlph(26, 0);
     vector<double> avgSizeWords = avgSize(pWords, totWords, numWordsForEachAlph);
-    addRat(pWords, 1, avgSizeWords, totWords, numWordsForEachAlph);
+    addRat(pWords, 1, avgSizeWords, totWords, numWordsForEachAlph, quadratureVec);
     vector<Wurd> flatVec = sortAndFlatten(pWords);
-    printer(flatVec);
-    for (int i = 2; i <= limit; i++){
-        int indicator = nextGuess(flatVec, pWords, numWordsForEachAlph, i,avgSizeWords, totWords, limit);
+    for (int i = 2; i <= 2; i++){
+        nextGuess(flatVec, pWords, numWordsForEachAlph, i,avgSizeWords, totWords, limit, quadratureVec);
     }
+    setSumBelow(flatVec);
     printer(flatVec);
 }
 #endif //LETTERBOXED_SOLVER_H
@@ -369,3 +370,10 @@ void solver(const int limit){
 //beo
 //ipy
 //snw
+
+//a
+//5
+//enr
+//sxp
+//tbl
+//ioa

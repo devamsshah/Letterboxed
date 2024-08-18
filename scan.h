@@ -7,10 +7,14 @@
 #include <vector>
 #include <string>
 #include "wurd.h"
+#include <algorithm>
+#include <cctype>
+
 #ifndef LETTERBOXED_SCAN_H
 #define LETTERBOXED_SCAN_H
 
 using namespace std;
+
 
 void loadWords(vector<string> & words){
     ifstream inputFile("words.txt");

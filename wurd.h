@@ -11,6 +11,7 @@ private:
     string w; // the word
     double p; // the guesses rating
     vector<Wurd> vec; //next guesses in order
+    double sumBelow; //sum of the p of the highest wurds in the vec
 public:
     Wurd(const string& str, double dbl) : w(str), p(dbl) {}
 
@@ -38,6 +39,13 @@ public:
         vec = v;
     }
 
+    double getSumBelow(){
+        return sumBelow;
+    }
+
+    void setSumBelow(double dbl){
+        sumBelow = dbl;
+    }
     void print() const{
         if(!vec.empty()){
             cout << w << ": " << p << "\t\t\t";
